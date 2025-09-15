@@ -1,0 +1,27 @@
+{% extends 'tickets/base.html' %}
+
+{% block content %}
+<h2>{{ ticket.title }}</h2>
+<p>Status: {{ ticket.status }}</p>
+<p>{{ ticket.description }}</p>
+
+<a href="{% url 'tickets:ticket_update' ticket.pk %}">Edit</a> |
+<a href="{% url 'tickets:ticket_delete' ticket.pk %}">Delete</a> |
+<a href="{% url 'tickets:ticket_list' %}">Back to List</a>
+
+<h3>Comments</h3>
+<ul>
+  {% for comment in comments %}
+    <li>{{ comment.author.username }}: {{ comment.content }}</li>
+  {% empty %}
+    <li>No comments yet.</li>
+  {% endfor %}
+</ul>
+
+<h3>Add a Comment</h3>
+<form method="post">
+  {% csrf_token %}
+  {{ comment_form.as_p }}
+  <button type="submit">Post Comment</button>
+</form>
+{% endblock %}

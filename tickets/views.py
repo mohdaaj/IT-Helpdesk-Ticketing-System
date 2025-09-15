@@ -3,6 +3,10 @@ from .models import Ticket, Comment
 from .forms import TicketForm, CommentForm
 from django.contrib.auth.decorators import login_required
 
+# ----------------------
+# Ticket Views
+# ----------------------
+
 @login_required
 def ticket_list(request):
     tickets = Ticket.objects.filter(created_by=request.user)
@@ -13,7 +17,7 @@ def ticket_detail(request, pk):
     ticket = get_object_or_404(Ticket, pk=pk)
     comments = ticket.comments.all()
     comment_form = CommentForm()
-    
+
     if request.method == 'POST':
         comment_form = CommentForm(request.POST)
         if comment_form.is_valid():
@@ -61,3 +65,28 @@ def ticket_delete(request, pk):
         ticket.delete()
         return redirect('tickets:ticket_list')
     return render(request, 'tickets/ticket_confirm_delete.html', {'ticket': ticket})
+
+# ----------------------
+# Comment Views
+# ----------------------
+
+@login_required
+def comment_update(request, pk):
+    comment = get_object_or_404(Comment, pk=pk, author=request.user)
+    if request.method == 'POST':
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            return redirect('tickets:ticket_detail', pk=comment.ticket.pk)
+    else:
+        form = CommentForm(instance=comment)
+    return render(request, 'tickets/comment_form.html', {'form': form, 'ticket': comment.ticket})
+
+@login_required
+def comment_delete(request, pk):
+    comment = get_object_or_404(Comment, pk=pk, author=request.user)
+    ticket = comment.ticket
+    if request.method == 'POST':
+        comment.delete()
+        return redirect('tickets:ticket_detail', pk=ticket.pk)
+    return render(request, 'tickets/comment_confirm_delete.html', {'comment': comment})

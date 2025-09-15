@@ -1,0 +1,11 @@
+{% extends 'tickets/base.html' %}
+
+{% block content %}
+<h2>{% if form.instance.pk %}Edit Ticket{% else %}Create Ticket{% endif %}</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Save</button>
+</form>
+<a href="{% url 'tickets:ticket_list' %}">Cancel</a>
+{% endblock %}
