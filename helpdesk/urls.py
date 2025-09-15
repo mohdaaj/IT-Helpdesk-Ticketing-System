@@ -16,9 +16,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from tickets import views as ticket_views  # using tickets app for pages too
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('tickets/', include('tickets.urls', namespace='tickets')),
-]
+    path('tickets/', include(('tickets.urls', 'tickets'), namespace='tickets')),
+    
+    # Auth + static pages
+    path('', ticket_views.home, name='home'),
+    path('signup/', ticket_views.signup, name='signup'),
+    path('about/', ticket_views.about, name='about'),
 
+    # built-in auth views (login/logout handled already, but logout url used in base.html)
+    path('accounts/', include('django.contrib.auth.urls')),
+]

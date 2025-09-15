@@ -90,3 +90,38 @@ def comment_delete(request, pk):
         comment.delete()
         return redirect('tickets:ticket_detail', pk=ticket.pk)
     return render(request, 'tickets/comment_confirm_delete.html', {'comment': comment})
+
+# ----------------------
+# Pages & Auth Views
+# ----------------------
+from django.contrib.auth import login
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+
+def home(request):
+    """Login page"""
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect('tickets:ticket_list')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'home.html', {'form': form})
+
+def signup(request):
+    """User registration"""
+    error_message = ''
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('tickets:ticket_list')
+        else:
+            error_message = 'Invalid sign up – try again.'
+    form = UserCreationForm()
+    return render(request, 'signup.html', {'form': form, 'error_message': error_message})
+
+def about(request):
+    return render(request, 'about.html')
