@@ -21,9 +21,6 @@
         <ul>
           {% if user.is_authenticated %}
             <li><a href="{% url 'tickets:ticket_list' %}">My Tickets</a></li>
-            {% if user.role == 'helper' %}
-              <li><a href="{% url 'tickets:ticket_list' %}">All Tickets</a></li>
-            {% endif %}
             {% if user.role == 'staff' %}
               <li><a href="{% url 'tickets:ticket_create' %}">Create Ticket</a></li>
             {% endif %}
