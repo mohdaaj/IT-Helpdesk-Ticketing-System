@@ -18,7 +18,17 @@ def ticket_detail(request, pk):
     comments = ticket.comments.all()
     comment_form = CommentForm()
 
-    if request.method == 'POST':
+    # Handle rating submission
+    if request.method == 'POST' and ticket.status == 'closed' and request.user == ticket.created_by:
+        rating = request.POST.get('rating')
+        if rating and rating.isdigit() and 1 <= int(rating) <= 5:
+            ticket.rating = int(rating)
+            ticket.save()
+            # Notification logic can be added here
+            return redirect('tickets:ticket_detail', pk=ticket.pk)
+
+    # Handle comment submission
+    elif request.method == 'POST':
         comment_form = CommentForm(request.POST)
         if comment_form.is_valid():
             new_comment = comment_form.save(commit=False)

@@ -1,0 +1,11 @@
+{% extends 'tickets/base.html' %}
+{% block content %}
+<h2>Close Ticket: {{ ticket.title }}</h2>
+<form method="post">
+  {% csrf_token %}
+  <label for="justification">Justification for closing:</label><br>
+  <textarea name="justification" id="justification" rows="4" cols="60" required>{{ ticket.justification }}</textarea><br><br>
+  <button type="submit">Close Ticket</button>
+  <a href="{% url 'tickets:ticket_detail' ticket.pk %}">Cancel</a>
+</form>
+{% endblock %}

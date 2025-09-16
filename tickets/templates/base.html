@@ -38,6 +38,20 @@
       </nav>
     </header>
     <main>
+      {% if user.is_authenticated and user.notifications.exists %}
+        <div class="notification-box">
+          <h4>Notifications</h4>
+          <ul>
+            {% for notification in user.notifications.all %}
+              {% if not notification.is_read %}
+                <li>{{ notification.message }}</li>
+              {% endif %}
+            {% empty %}
+              <li>No notifications.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
       {% block content %}{% endblock %}
     </main>
   </body>
