@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Ticket, Comment
+from .models import Ticket, Comment, Notification
 from .forms import TicketForm, CommentForm
 from django.contrib.auth.decorators import login_required
 
@@ -9,7 +9,11 @@ from django.contrib.auth.decorators import login_required
 
 @login_required
 def ticket_list(request):
-    tickets = Ticket.objects.filter(created_by=request.user)
+    user = request.user
+    if hasattr(user, 'role') and user.role == 'helper':
+        tickets = Ticket.objects.filter(status__in=['open', 'in_progress'])
+    else:
+        tickets = Ticket.objects.filter(created_by=user)
     return render(request, 'tickets/ticket_list.html', {'tickets': tickets})
 
 @login_required
@@ -24,7 +28,14 @@ def ticket_detail(request, pk):
         if rating and rating.isdigit() and 1 <= int(rating) <= 5:
             ticket.rating = int(rating)
             ticket.save()
-            # Notification logic can be added here
+            # Notify the helper (if any) that the ticket was rated
+            if ticket.justification and ticket.rating:
+                helpers = Notification.objects.filter(user__role='helper')
+                for helper in helpers:
+                    Notification.objects.create(
+                        user=helper.user,
+                        message=f"Ticket '{ticket.title}' was rated {ticket.rating}/5 by {request.user.username}."
+                    )
             return redirect('tickets:ticket_detail', pk=ticket.pk)
 
     # Handle comment submission
@@ -79,7 +90,11 @@ def ticket_update(request, pk):
             ticket.justification = justification
             ticket.status = 'closed'
             ticket.save()
-            # Notification logic will be added later
+            # Notify the ticket creator
+            Notification.objects.create(
+                user=ticket.created_by,
+                message=f"Your ticket '{ticket.title}' was closed by helper {request.user.username}. Justification: {justification}"
+            )
             return redirect('tickets:ticket_detail', pk=ticket.pk)
         return render(request, 'tickets/ticket_justify.html', {'ticket': ticket})
     else:
@@ -147,9 +162,15 @@ def signup(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('tickets:ticket_list')
+            try:
+                user = form.save()
+                login(request, user)
+                return redirect('tickets:ticket_list')
+            except Exception as e:
+                if 'UNIQUE constraint failed' in str(e):
+                    error_message = 'Username already exists. Please choose another.'
+                else:
+                    error_message = 'Sign up failed: ' + str(e)
         else:
             error_message = 'Invalid sign up – try again.'
     else:

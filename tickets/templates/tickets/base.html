@@ -21,7 +21,12 @@
         <ul>
           {% if user.is_authenticated %}
             <li><a href="{% url 'tickets:ticket_list' %}">My Tickets</a></li>
-            <li><a href="{% url 'tickets:ticket_create' %}">Create Ticket</a></li>
+            {% if user.role == 'helper' %}
+              <li><a href="{% url 'tickets:ticket_list' %}">All Tickets</a></li>
+            {% endif %}
+            {% if user.role == 'staff' %}
+              <li><a href="{% url 'tickets:ticket_create' %}">Create Ticket</a></li>
+            {% endif %}
             <li><a href="{% url 'about' %}">About</a></li>
             <li>
               <form id="logout-form" method="post" action="{% url 'logout' %}">
