@@ -13,11 +13,18 @@ class Notification(models.Model):
         return f"Notification for {self.user.username}: {self.message[:30]}"
 
 class MyUser(AbstractUser):
+
     ROLE_CHOICES = [
         ('staff', 'Staff'),
         ('helper', 'Helper'),
     ]
+    GENDER_CHOICES = [
+        ('male', 'Male'),
+        ('female', 'Female'),
+    ]
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='staff')
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, default='male')
+    birth_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return self.username

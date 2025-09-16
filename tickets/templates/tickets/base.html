@@ -29,6 +29,9 @@
             {% endif %}
             <li><a href="{% url 'about' %}">About</a></li>
             <li><a href="{% url 'tickets:notifications' %}">Notifications{% if unread_count %} <span class="notif-count">{{ unread_count }}</span>{% endif %}</a></li>
+            <li class="nav-profile">
+              <a href="{% url 'tickets:profile' %}">{{ user.username }}</a>
+            </li>
             <li>
               <form id="logout-form" method="post" action="{% url 'logout' %}">
                 {% csrf_token %}

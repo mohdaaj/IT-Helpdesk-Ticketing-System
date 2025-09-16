@@ -10,4 +10,5 @@ urlpatterns = [
     path('<int:pk>/edit/', views.ticket_update, name='ticket_update'),
     path('<int:pk>/delete/', views.ticket_delete, name='ticket_delete'),
     path('notifications/', views.notifications, name='notifications'),
+    path('profile/', views.profile, name='profile'),
 ]

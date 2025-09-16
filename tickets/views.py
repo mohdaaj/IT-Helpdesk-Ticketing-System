@@ -1,14 +1,31 @@
+
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Ticket, Comment, Notification
+from .forms import TicketForm, CommentForm
 from django.contrib.auth.decorators import login_required
+from .forms_profile import ProfileForm
+from django.contrib import messages
+
+# Profile view for editing user info
+@login_required
+def profile(request):
+    user = request.user
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('tickets:profile')
+    else:
+        form = ProfileForm(instance=user)
+    unread_count = user.notifications.filter(is_read=False).count()
+    return render(request, 'tickets/profile.html', {'form': form, 'unread_count': unread_count, 'user': user})
 
 # Notifications page view
 @login_required
 def notifications(request):
     unread_count = request.user.notifications.filter(is_read=False).count()
     return render(request, 'tickets/notifications.html', {'unread_count': unread_count})
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Ticket, Comment, Notification
-from .forms import TicketForm, CommentForm
-from django.contrib.auth.decorators import login_required
 
 # ----------------------
 # Ticket Views
