@@ -1,5 +1,12 @@
 from django import forms
-from .models import Ticket, Comment
+from .models import Ticket, Comment, CustomUser
+from django.contrib.auth.forms import UserCreationForm
+
+# Custom user creation form with role selection
+class CustomUserCreationForm(UserCreationForm):
+    class Meta:
+        model = CustomUser
+        fields = ("username", "email", "role")
 
 
 class TicketForm(forms.ModelForm):

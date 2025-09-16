@@ -35,6 +35,9 @@ def ticket_detail(request, pk):
 
 @login_required
 def ticket_create(request):
+    # Only staff can create tickets
+    if not hasattr(request.user, 'role') or request.user.role != 'staff':
+        return redirect('tickets:ticket_list')
     if request.method == 'POST':
         form = TicketForm(request.POST)
         if form.is_valid():
@@ -48,23 +51,41 @@ def ticket_create(request):
 
 @login_required
 def ticket_update(request, pk):
-    ticket = get_object_or_404(Ticket, pk=pk, created_by=request.user)
-    if request.method == 'POST':
-        form = TicketForm(request.POST, instance=ticket)
-        if form.is_valid():
-            form.save()
+    ticket = get_object_or_404(Ticket, pk=pk)
+    # Only staff who created the ticket can edit
+    if request.user.role == 'staff' and ticket.created_by == request.user:
+        if request.method == 'POST':
+            form = TicketForm(request.POST, instance=ticket)
+            if form.is_valid():
+                form.save()
+                return redirect('tickets:ticket_detail', pk=ticket.pk)
+        else:
+            form = TicketForm(instance=ticket)
+        return render(request, 'tickets/ticket_form.html', {'form': form})
+    # Only helpers can close/justify
+    elif request.user.role == 'helper':
+        if request.method == 'POST':
+            justification = request.POST.get('justification')
+            ticket.justification = justification
+            ticket.status = 'closed'
+            ticket.save()
+            # Notification logic will be added later
             return redirect('tickets:ticket_detail', pk=ticket.pk)
+        return render(request, 'tickets/ticket_justify.html', {'ticket': ticket})
     else:
-        form = TicketForm(instance=ticket)
-    return render(request, 'tickets/ticket_form.html', {'form': form})
+        return redirect('tickets:ticket_list')
 
 @login_required
 def ticket_delete(request, pk):
-    ticket = get_object_or_404(Ticket, pk=pk, created_by=request.user)
-    if request.method == 'POST':
-        ticket.delete()
+    ticket = get_object_or_404(Ticket, pk=pk)
+    # Only staff who created the ticket can delete
+    if request.user.role == 'staff' and ticket.created_by == request.user:
+        if request.method == 'POST':
+            ticket.delete()
+            return redirect('tickets:ticket_list')
+        return render(request, 'tickets/ticket_confirm_delete.html', {'ticket': ticket})
+    else:
         return redirect('tickets:ticket_list')
-    return render(request, 'tickets/ticket_confirm_delete.html', {'ticket': ticket})
 
 # ----------------------
 # Comment Views
@@ -95,7 +116,8 @@ def comment_delete(request, pk):
 # Pages & Auth Views
 # ----------------------
 from django.contrib.auth import login
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm
+from .forms import CustomUserCreationForm
 
 def home(request):
     """Login page"""
@@ -113,14 +135,15 @@ def signup(request):
     """User registration"""
     error_message = ''
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
             return redirect('tickets:ticket_list')
         else:
             error_message = 'Invalid sign up – try again.'
-    form = UserCreationForm()
+    else:
+        form = CustomUserCreationForm()
     return render(request, 'signup.html', {'form': form, 'error_message': error_message})
 
 def about(request):

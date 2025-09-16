@@ -1,3 +1,5 @@
+# Custom user model
+AUTH_USER_MODEL = 'tickets.CustomUser'
 """
 Django settings for helpdesk project.
 
