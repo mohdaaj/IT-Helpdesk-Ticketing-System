@@ -1,0 +1,17 @@
+{% extends 'tickets/base.html' %}
+{% block content %}
+<h2>Your Notifications</h2>
+<ul>
+  {% for notification in user.notifications.all %}
+    <li{% if not notification.is_read %} class="unread"{% endif %}>{{ notification.message }}</li>
+  {% empty %}
+    <li>No notifications.</li>
+  {% endfor %}
+</ul>
+<style>
+.unread {
+  font-weight: bold;
+  background: #f0f8ff;
+}
+</style>
+{% endblock %}

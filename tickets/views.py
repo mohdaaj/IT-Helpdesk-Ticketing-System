@@ -1,3 +1,10 @@
+from django.contrib.auth.decorators import login_required
+
+# Notifications page view
+@login_required
+def notifications(request):
+    unread_count = request.user.notifications.filter(is_read=False).count()
+    return render(request, 'tickets/notifications.html', {'unread_count': unread_count})
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Ticket, Comment, Notification
 from .forms import TicketForm, CommentForm
@@ -13,8 +20,9 @@ def ticket_list(request):
     if hasattr(user, 'role') and user.role == 'helper':
         tickets = Ticket.objects.filter(status__in=['open', 'in_progress'])
     else:
-        tickets = Ticket.objects.filter(created_by=user)
-    return render(request, 'tickets/ticket_list.html', {'tickets': tickets})
+        tickets = Ticket.objects.filter(created_by=user).exclude(status='closed')
+    unread_count = user.notifications.filter(is_read=False).count()
+    return render(request, 'tickets/ticket_list.html', {'tickets': tickets, 'unread_count': unread_count})
 
 @login_required
 def ticket_detail(request, pk):
@@ -48,10 +56,12 @@ def ticket_detail(request, pk):
             new_comment.save()
             return redirect('tickets:ticket_detail', pk=ticket.pk)
 
+    unread_count = request.user.notifications.filter(is_read=False).count()
     return render(request, 'tickets/ticket_detail.html', {
         'ticket': ticket,
         'comments': comments,
-        'comment_form': comment_form
+        'comment_form': comment_form,
+        'unread_count': unread_count
     })
 
 @login_required
@@ -68,7 +78,8 @@ def ticket_create(request):
             return redirect('tickets:ticket_list')
     else:
         form = TicketForm()
-    return render(request, 'tickets/ticket_form.html', {'form': form})
+    unread_count = request.user.notifications.filter(is_read=False).count()
+    return render(request, 'tickets/ticket_form.html', {'form': form, 'unread_count': unread_count})
 
 @login_required
 def ticket_update(request, pk):
@@ -82,7 +93,8 @@ def ticket_update(request, pk):
                 return redirect('tickets:ticket_detail', pk=ticket.pk)
         else:
             form = TicketForm(instance=ticket)
-        return render(request, 'tickets/ticket_form.html', {'form': form})
+        unread_count = request.user.notifications.filter(is_read=False).count()
+        return render(request, 'tickets/ticket_form.html', {'form': form, 'unread_count': unread_count})
     # Only helpers can close/justify
     elif request.user.role == 'helper':
         if request.method == 'POST':
@@ -95,8 +107,14 @@ def ticket_update(request, pk):
                 user=ticket.created_by,
                 message=f"Your ticket '{ticket.title}' was closed by helper {request.user.username}. Justification: {justification}"
             )
+            # Notify the helper (themselves)
+            Notification.objects.create(
+                user=request.user,
+                message=f"You closed ticket '{ticket.title}' for {ticket.created_by.username}. Justification: {justification}"
+            )
             return redirect('tickets:ticket_detail', pk=ticket.pk)
-        return render(request, 'tickets/ticket_justify.html', {'ticket': ticket})
+        unread_count = request.user.notifications.filter(is_read=False).count()
+        return render(request, 'tickets/ticket_justify.html', {'ticket': ticket, 'unread_count': unread_count})
     else:
         return redirect('tickets:ticket_list')
 
@@ -108,7 +126,8 @@ def ticket_delete(request, pk):
         if request.method == 'POST':
             ticket.delete()
             return redirect('tickets:ticket_list')
-        return render(request, 'tickets/ticket_confirm_delete.html', {'ticket': ticket})
+        unread_count = request.user.notifications.filter(is_read=False).count()
+        return render(request, 'tickets/ticket_confirm_delete.html', {'ticket': ticket, 'unread_count': unread_count})
     else:
         return redirect('tickets:ticket_list')
 
@@ -126,7 +145,8 @@ def comment_update(request, pk):
             return redirect('tickets:ticket_detail', pk=comment.ticket.pk)
     else:
         form = CommentForm(instance=comment)
-    return render(request, 'tickets/comment_form.html', {'form': form, 'ticket': comment.ticket})
+    unread_count = request.user.notifications.filter(is_read=False).count()
+    return render(request, 'tickets/comment_form.html', {'form': form, 'ticket': comment.ticket, 'unread_count': unread_count})
 
 @login_required
 def comment_delete(request, pk):
@@ -135,7 +155,8 @@ def comment_delete(request, pk):
     if request.method == 'POST':
         comment.delete()
         return redirect('tickets:ticket_detail', pk=ticket.pk)
-    return render(request, 'tickets/comment_confirm_delete.html', {'comment': comment})
+    unread_count = request.user.notifications.filter(is_read=False).count()
+    return render(request, 'tickets/comment_confirm_delete.html', {'comment': comment, 'unread_count': unread_count})
 
 # ----------------------
 # Pages & Auth Views
@@ -154,7 +175,8 @@ def home(request):
             return redirect('tickets:ticket_list')
     else:
         form = AuthenticationForm()
-    return render(request, 'home.html', {'form': form})
+    unread_count = request.user.notifications.filter(is_read=False).count() if request.user.is_authenticated else 0
+    return render(request, 'home.html', {'form': form, 'unread_count': unread_count})
 
 def signup(request):
     """User registration"""
@@ -175,7 +197,9 @@ def signup(request):
             error_message = 'Invalid sign up – try again.'
     else:
         form = CustomUserCreationForm()
-    return render(request, 'signup.html', {'form': form, 'error_message': error_message})
+    unread_count = request.user.notifications.filter(is_read=False).count() if request.user.is_authenticated else 0
+    return render(request, 'signup.html', {'form': form, 'error_message': error_message, 'unread_count': unread_count})
 
 def about(request):
-    return render(request, 'about.html')
+    unread_count = request.user.notifications.filter(is_read=False).count() if request.user.is_authenticated else 0
+    return render(request, 'about.html', {'unread_count': unread_count})

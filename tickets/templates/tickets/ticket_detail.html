@@ -6,6 +6,7 @@
 <p>Status: {{ ticket.status }}</p>
 <p>{{ ticket.description }}</p>
 
+{# Display helper justification if ticket is closed #}
 {% if ticket.status == 'closed' and ticket.justification %}
   <div class="ticket-justification">
     <strong>Helper's Justification:</strong>
@@ -13,22 +14,23 @@
   </div>
 {% endif %}
 
-{% if ticket.status == 'closed' and ticket.rating %}
-  <div class="ticket-rating">
-    <strong>Your Rating:</strong> {{ ticket.rating }} / 5
-  </div>
-{% elif ticket.status == 'closed' and user == ticket.created_by %}
-  <form method="post" action="">
-    {% csrf_token %}
-    <label for="rating">Rate the helper (1-5):</label>
-    <input type="number" name="rating" id="rating" min="1" max="5" required>
-    <button type="submit">Submit Rating</button>
-  </form>
+{# Display rating if ticket is closed #}
+{% if ticket.status == 'closed' %}
+  {% if ticket.rating %}
+    <div class="ticket-rating">
+      <strong>Your Rating:</strong> {{ ticket.rating }} / 5
+    </div>
+  {% elif user == ticket.created_by %}
+    <form method="post" action="">
+      {% csrf_token %}
+      <label for="rating">Rate the helper (1-5):</label>
+      <input type="number" name="rating" id="rating" min="1" max="5" required>
+      <button type="submit">Submit Rating</button>
+    </form>
+  {% endif %}
 {% endif %}
 
-<a href="{% url 'tickets:ticket_delete' ticket.pk %}">Delete</a> |
-<a href="{% url 'tickets:ticket_list' %}">Back to List</a>
-
+{# Action links depending on user role #}
 {% if user.role == 'staff' and ticket.created_by == user %}
   <a href="{% url 'tickets:ticket_update' ticket.pk %}">Edit</a> |
   <a href="{% url 'tickets:ticket_delete' ticket.pk %}">Delete</a> |
@@ -37,19 +39,5 @@
 {% endif %}
 <a href="{% url 'tickets:ticket_list' %}">Back to List</a>
 
-<h3>Comments</h3>
-<ul>
-  {% for comment in comments %}
-    <li>{{ comment.author.username }}: {{ comment.content }}</li>
-  {% empty %}
-    <li>No comments yet.</li>
-  {% endfor %}
-</ul>
 
-<h3>Add a Comment</h3>
-<form method="post">
-  {% csrf_token %}
-  {{ comment_form.as_p }}
-  <button type="submit">Post Comment</button>
-</form>
 {% endblock %}
