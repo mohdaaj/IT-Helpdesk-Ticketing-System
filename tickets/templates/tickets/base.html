@@ -1,50 +1,59 @@
-{% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Helpdesk</title>
-    <link rel="stylesheet" href="{% static 'css/base.css' %}" />
-    {% block head %}{% endblock %}
-  </head>
-  <body>
-    <header>
-      <div class="header-logo-container">
-        <a href="{% url 'home' %}">
-          <img src="{% static 'tickets/images/header-logo.svg' %}" alt="Helpdesk Logo" />
-        </a>
-      </div>
-      <nav>
-        <ul>
-          {% if user.is_authenticated %}
-            <li><a href="{% url 'tickets:ticket_list' %}">My Tickets</a></li>
-            {% if user.role == 'staff' %}
-              <li><a href="{% url 'tickets:ticket_create' %}">Create Ticket</a></li>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helpdesk Ticketing System</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap">
+    <style>
+        body { font-family: 'Roboto', sans-serif; background: #f8f9fa; }
+        .navbar-brand { font-weight: bold; letter-spacing: 1px; }
+        .notif-count { background: #dc3545; color: #fff; border-radius: 50%; padding: 0.2em 0.6em; font-size: 0.9em; margin-left: 0.3em; }
+        .priority-high { color: #dc3545; font-weight: bold; }
+        .priority-medium { color: #ffc107; font-weight: bold; }
+        .priority-low { color: #28a745; font-weight: bold; }
+        .ticket-card { box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-radius: 8px; margin-bottom: 1.5rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">Helpdesk</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item"><a class="nav-link" href="{% url 'tickets:ticket_list' %}">My Tickets</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'tickets:ticket_create' %}">Create Ticket</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
+            <li class="nav-item"><a class="nav-link position-relative" href="{% url 'tickets:notifications' %}">Notifications{% if unread_count %} <span class="notif-count position-absolute top-0 start-100 translate-middle">{{ unread_count }}</span>{% endif %}</a></li>
+          </ul>
+          <ul class="navbar-nav mb-2 mb-lg-0">
+            {% if user.is_authenticated %}
+              <li class="nav-item"><a class="nav-link" href="{% url 'tickets:profile' %}">{{ user.username }}</a></li>
+              <li class="nav-item d-flex align-items-center">
+                <form id="logout-form" method="post" action="{% url 'logout' %}" class="mb-0 ms-2">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+                </form>
+              </li>
+            {% else %}
+              <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Login</a></li>
+              <li class="nav-item"><a class="nav-link" href="{% url 'signup' %}">Sign Up</a></li>
             {% endif %}
-            <li><a href="{% url 'about' %}">About</a></li>
-            <li><a href="{% url 'tickets:notifications' %}">Notifications{% if unread_count %} <span class="notif-count">{{ unread_count }}</span>{% endif %}</a></li>
-            <li class="nav-profile">
-              <a href="{% url 'tickets:profile' %}">{{ user.username }}</a>
-            </li>
-            <li>
-              <form id="logout-form" method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button type="submit">Log out</button>
-              </form>
-            </li>
-          {% else %}
-            <li><a href="{% url 'about' %}">About</a></li>
-            <li><a href="{% url 'home' %}">Login</a></li>
-            <li><a href="{% url 'signup' %}">Sign Up</a></li>
-          {% endif %}
-        </ul>
-      </nav>
-    </header>
-    <main>
-      {% block content %}{% endblock %}
-    </main>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container py-4">
+        {% block content %}{% endblock %}
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
   </body>
 </html>

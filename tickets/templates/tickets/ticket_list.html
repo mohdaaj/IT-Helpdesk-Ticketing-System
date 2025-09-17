@@ -1,23 +1,46 @@
 {% extends 'tickets/base.html' %}
 
 {% block content %}
-<h2>{% if user.role == 'helper' %}All Open Tickets{% else %}My Tickets{% endif %}</h2>
-<ul>
-  {% for ticket in tickets %}
-    <li>
-      <a href="{% url 'tickets:ticket_detail' ticket.pk %}">{{ ticket.title }}</a>
-      ({{ ticket.status }})
-      | Priority: <strong>{{ ticket.get_priority_display }}</strong>
-      | Created: {{ ticket.created_at|date:"Y-m-d H:i" }}
-      {% if user.role == 'staff' and ticket.created_by == user %}
-        | <a href="{% url 'tickets:ticket_update' ticket.pk %}">Edit</a>
-        | <a href="{% url 'tickets:ticket_delete' ticket.pk %}">Delete</a>
-      {% elif user.role == 'helper' %}
-        | <a href="{% url 'tickets:ticket_update' ticket.pk %}">Close/Justify</a>
-      {% endif %}
-    </li>
-  {% empty %}
-    <li>No tickets found.</li>
-  {% endfor %}
-</ul>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="mb-0">{% if user.role == 'helper' %}All Open Tickets{% else %}My Tickets{% endif %}</h2>
+  <a href="{% url 'tickets:ticket_create' %}" class="btn btn-success">Create Ticket</a>
+</div>
+
+{% if tickets %}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle bg-white rounded shadow-sm">
+      <thead class="table-dark">
+        <tr>
+          <th>Title</th>
+          <th>Status</th>
+          <th>Priority</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ticket in tickets %}
+        <tr>
+          <td><a href="{% url 'tickets:ticket_detail' ticket.pk %}" class="fw-bold text-decoration-none">{{ ticket.title }}</a></td>
+          <td>{{ ticket.status }}</td>
+          <td>
+            <span class="priority-{{ ticket.priority|lower }}">{{ ticket.get_priority_display }}</span>
+          </td>
+          <td>{{ ticket.created_at|date:"Y-m-d H:i" }}</td>
+          <td>
+            {% if user.role == 'staff' and ticket.created_by == user %}
+              <a href="{% url 'tickets:ticket_update' ticket.pk %}" class="btn btn-sm btn-primary">Edit</a>
+              <a href="{% url 'tickets:ticket_delete' ticket.pk %}" class="btn btn-sm btn-danger">Delete</a>
+            {% elif user.role == 'helper' %}
+              <a href="{% url 'tickets:ticket_update' ticket.pk %}" class="btn btn-sm btn-secondary">Close/Justify</a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="alert alert-info">No tickets found.</div>
+{% endif %}
 {% endblock %}

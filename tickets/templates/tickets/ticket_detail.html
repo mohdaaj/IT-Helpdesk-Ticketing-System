@@ -1,56 +1,61 @@
 {% extends 'tickets/base.html' %}
 
 {% block content %}
-<h2>{{ ticket.title }}</h2>
-
-<p>Status: {{ ticket.status }}</p>
-<p>Priority: <strong>{{ ticket.get_priority_display }}</strong></p>
-<p>Created: {{ ticket.created_at|date:"Y-m-d H:i" }}</p>
-<p>{{ ticket.description }}</p>
-{% if user.role == 'helper' %}
-  <div class="staff-details">
-    <h4>Staff Details</h4>
-    <ul>
-      <li>Username: {{ ticket.created_by.username }}</li>
-      <li>Email: {{ ticket.created_by.email }}</li>
-      <li>Gender: {{ ticket.created_by.gender|capfirst }}</li>
-      <li>Birth Date: {{ ticket.created_by.birth_date }}</li>
-    </ul>
-  </div>
-{% endif %}
-
-{# Display helper justification if ticket is closed #}
-{% if ticket.status == 'closed' and ticket.justification %}
-  <div class="ticket-justification">
-    <strong>Helper's Justification:</strong>
-    <p>{{ ticket.justification }}</p>
-  </div>
-{% endif %}
-
-{# Display rating if ticket is closed #}
-{% if ticket.status == 'closed' %}
-  {% if ticket.rating %}
-    <div class="ticket-rating">
-      <strong>Your Rating:</strong> {{ ticket.rating }} / 5
+<div class="card ticket-card mb-4">
+  <div class="card-body">
+    <h2 class="card-title mb-3">{{ ticket.title }}</h2>
+    <div class="row mb-2">
+      <div class="col-md-6">
+        <p><strong>Status:</strong> <span class="badge bg-info text-dark">{{ ticket.status }}</span></p>
+        <p><strong>Priority:</strong> <span class="priority-{{ ticket.priority|lower }}">{{ ticket.get_priority_display }}</span></p>
+        <p><strong>Created:</strong> {{ ticket.created_at|date:"Y-m-d H:i" }}</p>
+      </div>
+      <div class="col-md-6">
+        {% if user.role == 'helper' %}
+        <div class="mb-2">
+          <strong>Staff Details:</strong>
+          <ul class="mb-0">
+            <li>Username: {{ ticket.created_by.username }}</li>
+            <li>Email: {{ ticket.created_by.email }}</li>
+            <li>Gender: {{ ticket.created_by.gender|capfirst }}</li>
+            <li>Birth Date: {{ ticket.created_by.birth_date }}</li>
+          </ul>
+        </div>
+        {% endif %}
+      </div>
     </div>
-  {% elif user == ticket.created_by %}
-    <form method="post" action="">
-      {% csrf_token %}
-      <label for="rating">Rate the helper (1-5):</label>
-      <input type="number" name="rating" id="rating" min="1" max="5" required>
-      <button type="submit">Submit Rating</button>
-    </form>
+    <hr>
+    <p class="mb-0"><strong>Description:</strong></p>
+    <p>{{ ticket.description }}</p>
+    {% if ticket.status == 'closed' and ticket.justification %}
+      <div class="alert alert-secondary mt-3">
+        <strong>Helper's Justification:</strong>
+        <p class="mb-0">{{ ticket.justification }}</p>
+      </div>
+    {% endif %}
+    {% if ticket.status == 'closed' %}
+      {% if ticket.rating %}
+        <div class="alert alert-success mt-3">
+          <strong>Your Rating:</strong> {{ ticket.rating }} / 5
+        </div>
+      {% elif user == ticket.created_by %}
+        <form method="post" action="" class="mt-3">
+          {% csrf_token %}
+          <label for="rating" class="form-label">Rate the helper (1-5):</label>
+          <input type="number" name="rating" id="rating" min="1" max="5" required class="form-control w-auto d-inline-block">
+          <button type="submit" class="btn btn-primary btn-sm">Submit Rating</button>
+        </form>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+<div class="mb-4">
+  {% if user.role == 'staff' and ticket.created_by == user %}
+    <a href="{% url 'tickets:ticket_update' ticket.pk %}" class="btn btn-primary">Edit</a>
+    <a href="{% url 'tickets:ticket_delete' ticket.pk %}" class="btn btn-danger">Delete</a>
+  {% elif user.role == 'helper' %}
+    <a href="{% url 'tickets:ticket_update' ticket.pk %}" class="btn btn-secondary">Close/Justify</a>
   {% endif %}
-{% endif %}
-
-{# Action links depending on user role #}
-{% if user.role == 'staff' and ticket.created_by == user %}
-  <a href="{% url 'tickets:ticket_update' ticket.pk %}">Edit</a> |
-  <a href="{% url 'tickets:ticket_delete' ticket.pk %}">Delete</a> |
-{% elif user.role == 'helper' %}
-  <a href="{% url 'tickets:ticket_update' ticket.pk %}">Close/Justify</a> |
-{% endif %}
-<a href="{% url 'tickets:ticket_list' %}">Back to List</a>
-
-
+  <a href="{% url 'tickets:ticket_list' %}" class="btn btn-link">Back to List</a>
+</div>
 {% endblock %}

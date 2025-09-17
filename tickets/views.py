@@ -25,7 +25,9 @@ def profile(request):
 # Notifications page view
 @login_required
 def notifications(request):
-    unread_count = request.user.notifications.filter(is_read=False).count()
+    # Mark all notifications as read when visiting the notifications page
+    request.user.notifications.filter(is_read=False).update(is_read=True)
+    unread_count = 0
     return render(request, 'tickets/notifications.html', {'unread_count': unread_count})
 
 # ----------------------
