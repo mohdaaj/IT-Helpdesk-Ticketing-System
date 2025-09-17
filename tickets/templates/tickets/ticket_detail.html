@@ -4,7 +4,20 @@
 <h2>{{ ticket.title }}</h2>
 
 <p>Status: {{ ticket.status }}</p>
+<p>Priority: <strong>{{ ticket.get_priority_display }}</strong></p>
+<p>Created: {{ ticket.created_at|date:"Y-m-d H:i" }}</p>
 <p>{{ ticket.description }}</p>
+{% if user.role == 'helper' %}
+  <div class="staff-details">
+    <h4>Staff Details</h4>
+    <ul>
+      <li>Username: {{ ticket.created_by.username }}</li>
+      <li>Email: {{ ticket.created_by.email }}</li>
+      <li>Gender: {{ ticket.created_by.gender|capfirst }}</li>
+      <li>Birth Date: {{ ticket.created_by.birth_date }}</li>
+    </ul>
+  </div>
+{% endif %}
 
 {# Display helper justification if ticket is closed #}
 {% if ticket.status == 'closed' and ticket.justification %}

@@ -7,6 +7,8 @@
     <li>
       <a href="{% url 'tickets:ticket_detail' ticket.pk %}">{{ ticket.title }}</a>
       ({{ ticket.status }})
+      | Priority: <strong>{{ ticket.get_priority_display }}</strong>
+      | Created: {{ ticket.created_at|date:"Y-m-d H:i" }}
       {% if user.role == 'staff' and ticket.created_by == user %}
         | <a href="{% url 'tickets:ticket_update' ticket.pk %}">Edit</a>
         | <a href="{% url 'tickets:ticket_delete' ticket.pk %}">Delete</a>

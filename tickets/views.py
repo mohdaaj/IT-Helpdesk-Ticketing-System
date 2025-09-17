@@ -1,3 +1,4 @@
+from django.db import models
 
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Ticket, Comment, Notification
@@ -35,9 +36,16 @@ def notifications(request):
 def ticket_list(request):
     user = request.user
     if hasattr(user, 'role') and user.role == 'helper':
-        tickets = Ticket.objects.filter(status__in=['open', 'in_progress'])
+        # Order by priority (high > medium > low) and then by created_at descending
+        priority_order = models.Case(
+            models.When(priority='high', then=0),
+            models.When(priority='medium', then=1),
+            models.When(priority='low', then=2),
+            output_field=models.IntegerField(),
+        )
+        tickets = Ticket.objects.filter(status__in=['open', 'in_progress']).order_by(priority_order, '-created_at')
     else:
-        tickets = Ticket.objects.filter(created_by=user).exclude(status='closed')
+        tickets = Ticket.objects.filter(created_by=user).exclude(status='closed').order_by('-created_at')
     unread_count = user.notifications.filter(is_read=False).count()
     return render(request, 'tickets/ticket_list.html', {'tickets': tickets, 'unread_count': unread_count})
 
