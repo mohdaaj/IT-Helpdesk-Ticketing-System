@@ -1,17 +1,28 @@
 {% extends 'tickets/base.html' %}
 {% block content %}
-<h2>Your Notifications</h2>
-<ul>
-  {% for notification in user.notifications.all %}
-    <li{% if not notification.is_read %} class="unread"{% endif %}>{{ notification.message }}</li>
-  {% empty %}
-    <li>No notifications.</li>
-  {% endfor %}
-</ul>
-<style>
-.unread {
-  font-weight: bold;
-  background: #f0f8ff;
-}
-</style>
+<div class="mx-auto" style="max-width: 700px;">
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white">
+      <h3 class="mb-0">Notifications</h3>
+    </div>
+    <div class="card-body p-0">
+      {% if user.notifications.all %}
+        <div class="list-group list-group-flush">
+          {% for notification in user.notifications.all %}
+            <div class="list-group-item d-flex justify-content-between align-items-center {% if not notification.is_read %}list-group-item-info fw-bold{% endif %}">
+              <span class="mb-0 {% if not notification.is_read %}text-primary{% endif %}">{{ notification.message }}</span>
+              {% if not notification.is_read %}
+                <span class="badge bg-primary">New</span>
+              {% endif %}
+            </div>
+          {% empty %}
+            <div class="list-group-item text-muted">No notifications.</div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="alert alert-info m-3">No notifications.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
 {% endblock %}

@@ -32,7 +32,7 @@
               <a href="{% url 'tickets:ticket_update' ticket.pk %}" class="btn btn-sm btn-primary">Edit</a>
               <a href="{% url 'tickets:ticket_delete' ticket.pk %}" class="btn btn-sm btn-danger">Delete</a>
             {% elif user.role == 'helper' %}
-              <a href="{% url 'tickets:ticket_update' ticket.pk %}" class="btn btn-sm btn-secondary">Close/Justify</a>
+              <a href="{% url 'tickets:ticket_update' ticket.pk %}" class="btn btn-sm btn-success">Close/Justify</a>
             {% endif %}
           </td>
         </tr>

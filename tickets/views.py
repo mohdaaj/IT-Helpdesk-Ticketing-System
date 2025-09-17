@@ -77,8 +77,8 @@ def ticket_detail(request, pk):
 
 @login_required
 def ticket_create(request):
-    # Only staff can create tickets
-    if not hasattr(request.user, 'role') or request.user.role != 'staff':
+    # Allow both staff and helpers to create tickets
+    if not hasattr(request.user, 'role') or request.user.role not in ['staff', 'helper']:
         return redirect('tickets:ticket_list')
     if request.method == 'POST':
         form = TicketForm(request.POST)

@@ -1,11 +1,28 @@
 {% extends 'tickets/base.html' %}
 
 {% block content %}
-<h2>{% if form.instance.pk %}Edit Ticket{% else %}Create Ticket{% endif %}</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Save</button>
-</form>
-<a href="{% url 'tickets:ticket_list' %}">Cancel</a>
+<div class="card ticket-card mx-auto" style="max-width: 600px;">
+  <div class="card-body">
+    <h2 class="card-title mb-4">{% if form.instance.pk %}Edit Ticket{% else %}Create Ticket{% endif %}</h2>
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="mb-3">
+          <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+            <div class="form-text">{{ field.help_text }}</div>
+          {% endif %}
+          {% for error in field.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{% url 'tickets:ticket_list' %}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}

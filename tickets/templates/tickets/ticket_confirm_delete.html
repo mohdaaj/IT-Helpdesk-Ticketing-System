@@ -4,7 +4,7 @@
 <p>Are you sure you want to delete "{{ ticket.title }}"?</p>
 <form method="post">
   {% csrf_token %}
-  <button type="submit">Yes, Delete</button>
-  <a href="{% url 'tickets:ticket_detail' ticket.pk %}">Cancel</a>
+  <button type="submit" class="btn btn-danger">Yes, Delete</button>
+  <a href="{% url 'tickets:ticket_detail' ticket.pk %}" class="btn btn-outline-secondary ms-2">Cancel</a>
 </form>
 {% endblock %}

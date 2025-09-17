@@ -54,8 +54,8 @@
     <a href="{% url 'tickets:ticket_update' ticket.pk %}" class="btn btn-primary">Edit</a>
     <a href="{% url 'tickets:ticket_delete' ticket.pk %}" class="btn btn-danger">Delete</a>
   {% elif user.role == 'helper' %}
-    <a href="{% url 'tickets:ticket_update' ticket.pk %}" class="btn btn-secondary">Close/Justify</a>
+  <a href="{% url 'tickets:ticket_update' ticket.pk %}" class="btn btn-success">Close/Justify</a>
   {% endif %}
-  <a href="{% url 'tickets:ticket_list' %}" class="btn btn-link">Back to List</a>
+  <a href="{% url 'tickets:ticket_list' %}" class="btn btn-outline-secondary">Back to List</a>
 </div>
 {% endblock %}

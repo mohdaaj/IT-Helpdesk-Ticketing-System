@@ -1,8 +1,34 @@
 {% extends 'tickets/base.html' %}
 {% block content %}
-<h1>About the Helpdesk</h1>
-<hr />
-<p class="page-content">
-  This Helpdesk system allows you to create support tickets and track issues easily.
-</p>
+<div class="mx-auto" style="max-width: 700px;">
+  <div class="card shadow-sm">
+    <div class="card-header bg-dark text-white">
+      <h2 class="mb-0">About the Helpdesk</h2>
+    </div>
+    <div class="card-body">
+      <p class="lead mb-3">
+        Welcome to the Helpdesk Ticketing System! This platform streamlines IT support by allowing users to create, track, and manage support tickets efficiently.
+      </p>
+      <ul class="list-group list-group-flush mb-4">
+        <li class="list-group-item"><strong>Easy Ticket Creation:</strong> Submit and manage your IT issues with a simple form.</li>
+        <li class="list-group-item"><strong>Role-Based Access:</strong> Staff and helpers have tailored dashboards and permissions.</li>
+        <li class="list-group-item"><strong>Priority & Status:</strong> Tickets are sorted by priority and status for quick resolution.</li>
+        <li class="list-group-item"><strong>Notifications:</strong> Stay updated with real-time notifications for ticket actions.</li>
+        <li class="list-group-item"><strong>Profile Management:</strong> Edit your personal info and view your activity.</li>
+        <li class="list-group-item"><strong>Modern UI:</strong> Clean, responsive design for a seamless experience.</li>
+      </ul>
+      <div class="mb-3">
+        <h5>Contact</h5>
+        <p class="mb-1">For support or feedback, contact:</p>
+        <a href="mailto:mohdaaj.2000@gmail.com" class="text-decoration-none">
+          <i class="bi bi-envelope-fill"></i> mohdaaj.2000@gmail.com
+        </a>
+      </div>
+      <hr>
+      <div class="text-end text-muted mt-4">
+        <small>Made by Mohamed Ali Ahmed Jaber &copy; {{ now|date:"Y" }}</small>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
