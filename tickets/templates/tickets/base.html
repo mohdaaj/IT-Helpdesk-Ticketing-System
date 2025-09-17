@@ -7,15 +7,30 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap">
-    <style>
-        body { font-family: 'Roboto', sans-serif; background: #f8f9fa; }
-        .navbar-brand { font-weight: bold; letter-spacing: 1px; }
-        .notif-count { background: #dc3545; color: #fff; border-radius: 50%; padding: 0.2em 0.6em; font-size: 0.9em; margin-left: 0.3em; }
-        .priority-high { color: #dc3545; font-weight: bold; }
-        .priority-medium { color: #ffc107; font-weight: bold; }
-        .priority-low { color: #28a745; font-weight: bold; }
-        .ticket-card { box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-radius: 8px; margin-bottom: 1.5rem; }
-    </style>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 100%);
+      min-height: 100vh;
+    }
+    .navbar-brand { font-weight: bold; letter-spacing: 1px; }
+    .notif-count { background: #dc3545; color: #fff; border-radius: 50%; padding: 0.2em 0.6em; font-size: 0.9em; margin-left: 0.3em; }
+    .priority-high { color: #dc3545; font-weight: bold; }
+    .priority-medium { color: #ffc107; font-weight: bold; }
+    .priority-low { color: #28a745; font-weight: bold; }
+    .ticket-card, .card {
+      box-shadow: 0 4px 24px 0 rgba(80, 112, 255, 0.10), 0 1.5px 4px 0 rgba(0,0,0,0.04);
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      background: #fff;
+    }
+    .card-header.bg-dark {
+      background: linear-gradient(90deg, #6366f1 0%, #2563eb 100%) !important;
+    }
+    .btn-primary, .btn-success, .btn-danger, .btn-outline-secondary {
+      border-radius: 8px;
+    }
+  </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">

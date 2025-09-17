@@ -1,58 +1,132 @@
-{% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Helpdesk</title>
-    <link rel="stylesheet" href="{% static 'css/base.css' %}" />
-    {% block head %}{% endblock %}
-  </head>
-  <body>
-    <header>
-      <div class="header-logo-container">
-        <a href="{% url 'home' %}">
-          <img src="{% static 'tickets/images/header-logo.svg' %}" alt="Helpdesk Logo" />
-        </a>
-      </div>
-      <nav>
-        <ul>
-          {% if user.is_authenticated %}
-            <li><a href="{% url 'tickets:ticket_list' %}">My Tickets</a></li>
-            <li><a href="{% url 'tickets:ticket_create' %}">Create Ticket</a></li>
-            <li><a href="{% url 'about' %}">About</a></li>
-            <li>
-              <form id="logout-form" method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button type="submit">Log out</button>
-              </form>
-            </li>
-          {% else %}
-            <li><a href="{% url 'about' %}">About</a></li>
-            <li><a href="{% url 'home' %}">Login</a></li>
-            <li><a href="{% url 'signup' %}">Sign Up</a></li>
-          {% endif %}
-        </ul>
-      </nav>
-    </header>
-    <main>
-      {% if user.is_authenticated and user.notifications.exists %}
-        <div class="notification-box">
-          <h4>Notifications</h4>
-          <ul>
-            {% for notification in user.notifications.all %}
-              {% if not notification.is_read %}
-                <li>{{ notification.message }}</li>
-              {% endif %}
-            {% empty %}
-              <li>No notifications.</li>
-            {% endfor %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helpdesk Ticketing System</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #181c2a 0%, #232946 100%);
+      min-height: 100vh;
+      color: #e0e6f7;
+    }
+    .navbar, .card-header.bg-dark {
+      background: linear-gradient(90deg, #232946 0%, #181c2a 100%) !important;
+    }
+    .navbar-brand { font-weight: bold; letter-spacing: 1px; color: #fff !important; }
+    .notif-count { background: #dc3545; color: #fff; border-radius: 50%; padding: 0.2em 0.6em; font-size: 0.9em; margin-left: 0.3em; }
+    .priority-high { color: #ff6b6b; font-weight: bold; }
+    .priority-medium { color: #ffd166; font-weight: bold; }
+    .priority-low { color: #06d6a0; font-weight: bold; }
+    .ticket-card, .card {
+      box-shadow: 0 4px 24px 0 rgba(80, 112, 255, 0.10), 0 1.5px 4px 0 rgba(0,0,0,0.10);
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      background: #232946;
+      color: #e0e6f7;
+    }
+    .card-header.bg-dark {
+      border-bottom: 1px solid #2e3650;
+    }
+    .form-control, .form-select, textarea, input, select {
+      background: #181c2a !important;
+      color: #e0e6f7 !important;
+      border: 1px solid #2e3650;
+    }
+    .form-label, .form-text, label { color: #b8c1ec; }
+    .btn-primary {
+      background: #4f5d75;
+      border: none;
+      color: #fff;
+    }
+    .btn-primary:hover, .btn-primary:focus {
+      background: #232946;
+      color: #fff;
+    }
+    .btn-success {
+      background: #06d6a0;
+      border: none;
+      color: #181c2a;
+    }
+    .btn-success:hover, .btn-success:focus {
+      background: #0ecf8d;
+      color: #181c2a;
+    }
+    .btn-danger {
+      background: #ff6b6b;
+      border: none;
+      color: #fff;
+    }
+    .btn-danger:hover, .btn-danger:focus {
+      background: #d90429;
+      color: #fff;
+    }
+    .btn-outline-secondary {
+      border: 1px solid #b8c1ec;
+      color: #b8c1ec;
+      background: transparent;
+    }
+    .btn-outline-secondary:hover, .btn-outline-secondary:focus {
+      background: #232946;
+      color: #fff;
+    }
+    .list-group-item, .table, .table th, .table td {
+      background: #232946 !important;
+      color: #e0e6f7 !important;
+    }
+    .table-dark th {
+      background: #181c2a !important;
+      color: #fff !important;
+    }
+    .alert-info, .alert-success, .alert-danger, .alert-secondary {
+      background: #232946;
+      color: #e0e6f7;
+      border: 1px solid #2e3650;
+    }
+    .fw-bold.text-primary { color: #ffd166 !important; }
+  </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">Helpdesk</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item"><a class="nav-link" href="{% url 'tickets:ticket_list' %}">My Tickets</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'tickets:ticket_create' %}">Create Ticket</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
+            <li class="nav-item"><a class="nav-link position-relative" href="{% url 'tickets:notifications' %}">Notifications{% if unread_count %} <span class="notif-count position-absolute top-0 start-100 translate-middle">{{ unread_count }}</span>{% endif %}</a></li>
+          </ul>
+          <ul class="navbar-nav mb-2 mb-lg-0">
+            {% if user.is_authenticated %}
+              <li class="nav-item"><a class="nav-link" href="{% url 'tickets:profile' %}">{{ user.username }}</a></li>
+              <li class="nav-item d-flex align-items-center">
+                <form id="logout-form" method="post" action="{% url 'logout' %}" class="mb-0 ms-2">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+                </form>
+              </li>
+            {% else %}
+              <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Login</a></li>
+              <li class="nav-item"><a class="nav-link" href="{% url 'signup' %}">Sign Up</a></li>
+            {% endif %}
           </ul>
         </div>
-      {% endif %}
-      {% block content %}{% endblock %}
-    </main>
+      </div>
+    </nav>
+    <div class="container py-4">
+        {% block content %}{% endblock %}
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
   </body>
 </html>

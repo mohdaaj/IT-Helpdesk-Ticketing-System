@@ -5,24 +5,26 @@
 {% endblock %}
 
 {% block content %}
-<div class="page-header">
-  <h1>Sign Up</h1>
-  <img src="{% static 'images/nerd-cat.svg' %}" alt="A person using a computer" />
+<div class="d-flex justify-content-center align-items-center" style="min-height: 60vh;">
+  <form action="" method="post" class="p-4 rounded shadow bg-white" style="min-width:320px;max-width:400px;width:100%;" autocomplete="off">
+    <h2 class="mb-4 text-center">Sign Up</h2>
+    {% if error_message %}
+      <div class="alert alert-danger">{{ error_message }}</div>
+    {% endif %}
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="mb-3">
+        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}
+          <div class="form-text">{{ field.help_text }}</div>
+        {% endif %}
+        {% for error in field.errors %}
+          <div class="text-danger small">{{ error }}</div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary w-100">Sign Up</button>
+  </form>
 </div>
-
-{% if error_message %}
-  <p class="red-text">{{ error_message }}</p>
-{% endif %}
-
-<form action="" method="post" class="form-container" autocomplete="off">
-  {% csrf_token %}
-  <table>
-    {{ form.username.label_tag }} {{ form.username }}<br>
-    {{ form.email.label_tag }} {{ form.email }}<br>
-    {{ form.password1.label_tag }} {{ form.password1 }}<br>
-    {{ form.password2.label_tag }} {{ form.password2 }}<br>
-    {{ form.role.label_tag }} {{ form.role }}<br>
-  </table>
-  <button type="submit" class="btn submit">Submit!</button>
-</form>
 {% endblock %}
