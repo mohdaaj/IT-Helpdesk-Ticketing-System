@@ -3,13 +3,20 @@
 
 A Django-based ticketing system for managing IT support requests. Users can log in, create, track, and resolve IT tickets.
 
+
 ## Features
-- User authentication (login, logout, signup).
-- Create, read, update, and delete (CRUD) tickets.
-- Each ticket is linked to the user who created it.
-- Ticket statuses: Open, In Progress, Resolved, Closed.
-- Authorization: only the ticket creator can edit or delete their tickets.
-- Responsive design with Bootstrap.
+- Custom user model with roles: Staff and Helper
+- User authentication (login, logout, signup)
+- Profile page for editing username, gender, and birth date
+- Create, read, update, and delete (CRUD) tickets
+- Ticket statuses: Open, In Progress, Resolved, Closed
+- Ticket priority: High, Medium, Low (helpers see prioritized list)
+- Ticket justification and rating system
+- Notification system with unread badge and notifications page
+- Staff can edit/delete their own tickets; helpers can close/justify tickets
+- Responsive, modern UI with Bootstrap and dark mode
+- About page, home/login, and signup pages
+
 
 
 ## Tech Stack
@@ -17,32 +24,64 @@ A Django-based ticketing system for managing IT support requests. Users can log 
 - Django
 - SQLite (development) / PostgreSQL (production)
 
+
 ## Project Structure
 
 ```
 IT-Helpdesk-Ticketing-System/
 │   manage.py
 │   README.md
+│   db.sqlite3
+│   HELP desk ERD.PNG
 │
 ├── helpdesk/
 │   ├── __init__.py
 │   ├── asgi.py
 │   ├── settings.py
 │   ├── urls.py
-│   ├── wsgi.py
-│   └── __pycache__/
-│       ├── __init__.cpython-313.pyc
-│       └── settings.cpython-313.pyc
+│   └── wsgi.py
 │
 ├── tickets/
 │   ├── __init__.py
 │   ├── admin.py
 │   ├── apps.py
+│   ├── forms.py
+│   ├── forms_profile.py
 │   ├── models.py
 │   ├── tests.py
+│   ├── urls.py
 │   ├── views.py
-│   └── migrations/
-│       └── __init__.py
+│   ├── static/
+│   │   ├── css/
+│   │   │   └── base.css
+│   │   └── tickets/
+│   │       ├── css/
+│   │       │   └── style.css
+│   │       └── images/
+│   │           └── header-logo.svg
+│   └── templates/
+│       ├── about.html
+│       ├── base.html
+│       ├── home.html
+│       ├── signup.html
+│       └── tickets/
+│           ├── base.html
+│           ├── notifications.html
+│           ├── profile.html
+│           ├── ticket_confirm_delete.html
+│           ├── ticket_detail.html
+│           ├── ticket_form.html
+│           ├── ticket_justify.html
+│           └── ticket_list.html
+│
+├── venv/ (virtual environment)
+└── .git/ (if using git)
 ```
+
+
+
+## Author
+
+This project was developed by mohdaaj and contributors.
 
 
