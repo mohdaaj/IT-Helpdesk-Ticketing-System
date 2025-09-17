@@ -9,13 +9,13 @@ A Django-based ticketing system for managing IT support requests. Users can log 
 - User authentication (login, logout, signup)
 - Profile page for editing username, gender, and birth date
 - Create, read, update, and delete (CRUD) tickets
-- Ticket statuses: Open, In Progress, Resolved, Closed
+- Ticket statuses: Open, Closed
 - Ticket priority: High, Medium, Low (helpers see prioritized list)
 - Ticket justification and rating system
 - Notification system with unread badge and notifications page
 - Staff can edit/delete their own tickets; helpers can close/justify tickets
-- Responsive, modern UI with Bootstrap and dark mode
-- About page, home/login, and signup pages
+- Responsive, modern UI with Bootstrap
+- About page
 
 
 
