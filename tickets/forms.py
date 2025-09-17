@@ -1,5 +1,5 @@
 from django import forms
-from .models import Ticket, Comment, MyUser
+from .models import Ticket, MyUser
 from django.contrib.auth.forms import UserCreationForm
 
 
@@ -16,7 +16,3 @@ class TicketForm(forms.ModelForm):
         fields = ['title', 'description', 'category', 'priority']
 
 
-class CommentForm(forms.ModelForm):
-    class Meta:
-        model = Comment
-        fields = ['content']

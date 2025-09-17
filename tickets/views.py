@@ -1,8 +1,8 @@
 from django.db import models
 
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Ticket, Comment, Notification
-from .forms import TicketForm, CommentForm
+from .models import Ticket, Notification
+from .forms import TicketForm
 from django.contrib.auth.decorators import login_required
 from .forms_profile import ProfileForm
 from django.contrib import messages
@@ -52,9 +52,6 @@ def ticket_list(request):
 @login_required
 def ticket_detail(request, pk):
     ticket = get_object_or_404(Ticket, pk=pk)
-    comments = ticket.comments.all()
-    comment_form = CommentForm()
-
     # Handle rating submission
     if request.method == 'POST' and ticket.status == 'closed' and request.user == ticket.created_by:
         rating = request.POST.get('rating')
@@ -70,22 +67,9 @@ def ticket_detail(request, pk):
                         message=f"Ticket '{ticket.title}' was rated {ticket.rating}/5 by {request.user.username}."
                     )
             return redirect('tickets:ticket_detail', pk=ticket.pk)
-
-    # Handle comment submission
-    elif request.method == 'POST':
-        comment_form = CommentForm(request.POST)
-        if comment_form.is_valid():
-            new_comment = comment_form.save(commit=False)
-            new_comment.ticket = ticket
-            new_comment.author = request.user
-            new_comment.save()
-            return redirect('tickets:ticket_detail', pk=ticket.pk)
-
     unread_count = request.user.notifications.filter(is_read=False).count()
     return render(request, 'tickets/ticket_detail.html', {
         'ticket': ticket,
-        'comments': comments,
-        'comment_form': comment_form,
         'unread_count': unread_count
     })
 
@@ -156,32 +140,6 @@ def ticket_delete(request, pk):
     else:
         return redirect('tickets:ticket_list')
 
-# ----------------------
-# Comment Views
-# ----------------------
-
-@login_required
-def comment_update(request, pk):
-    comment = get_object_or_404(Comment, pk=pk, author=request.user)
-    if request.method == 'POST':
-        form = CommentForm(request.POST, instance=comment)
-        if form.is_valid():
-            form.save()
-            return redirect('tickets:ticket_detail', pk=comment.ticket.pk)
-    else:
-        form = CommentForm(instance=comment)
-    unread_count = request.user.notifications.filter(is_read=False).count()
-    return render(request, 'tickets/comment_form.html', {'form': form, 'ticket': comment.ticket, 'unread_count': unread_count})
-
-@login_required
-def comment_delete(request, pk):
-    comment = get_object_or_404(Comment, pk=pk, author=request.user)
-    ticket = comment.ticket
-    if request.method == 'POST':
-        comment.delete()
-        return redirect('tickets:ticket_detail', pk=ticket.pk)
-    unread_count = request.user.notifications.filter(is_read=False).count()
-    return render(request, 'tickets/comment_confirm_delete.html', {'comment': comment, 'unread_count': unread_count})
 
 # ----------------------
 # Pages & Auth Views
