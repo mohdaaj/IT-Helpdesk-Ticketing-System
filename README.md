@@ -94,7 +94,7 @@ IT-Helpdesk-Ticketing-System/
 
 - [My Trello](https://trello.com/invite/b/68c4f7078120418905c3f4b0/ATTI774f23c1448e0ee46e469fd41f5b46390476E4A7/it-help-desk-ticketing-system)
 
-- [My ERD](https://imgur.com/a/KnB6viZ)
+- [My ERD](https://imgur.com/a/zyTCh5a)
 
 ## Author
 
