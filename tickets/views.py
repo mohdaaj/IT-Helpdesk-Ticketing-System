@@ -22,15 +22,15 @@ def profile(request):
     unread_count = user.notifications.filter(is_read=False).count()
     return render(request, 'tickets/profile.html', {'form': form, 'unread_count': unread_count, 'user': user})
 
-# Notifications page view
+
 @login_required
 def notifications(request):
     user = request.user
-    # Mark all notifications as read when visiting the notifications page
+    
     user.notifications.filter(is_read=False).update(is_read=True)
     unread_count = 0
     rating_error = None
-    # Only staff can rate tickets
+    
     tickets_to_rate = []
     if hasattr(user, 'role') and user.role == 'staff':
         tickets_to_rate = user.tickets.filter(status='closed', rating__isnull=True)
@@ -42,19 +42,17 @@ def notifications(request):
                 if rating and rating.isdigit() and 1 <= int(rating) <= 5:
                     ticket.rating = int(rating)
                     ticket.save()
-                    # Notify the helper who closed the ticket (if any)
-                    # Find the helper from the notifications for this ticket
+  
                     helper_notification = Notification.objects.filter(
                         message__icontains=f"closed by helper", user__role='staff', user=ticket.created_by
                     ).order_by('-created_at').first()
-                    # If you store the helper in another way, update this logic accordingly
-                    # Instead, let's try to find the helper by the notification sent when closing
+
                     from django.db.models import Q
                     close_notif = Notification.objects.filter(
                         Q(message__icontains="closed by helper") & Q(message__icontains=ticket.title)
                     ).order_by('-created_at').first()
                     if close_notif:
-                        # Extract helper username from message
+
                         import re
                         m = re.search(r"closed by helper (\w+)", close_notif.message)
                         if m:
