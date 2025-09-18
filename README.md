@@ -4,6 +4,16 @@
 A Django-based ticketing system for managing IT support requests. Users can log in, create, track, and resolve IT tickets.
 
 
+
+## MY Teckits Screen for Helper
+
+![Helper Ticket Screen](tickets/static/tickets/images/My_teckits_screen_Helper.PNG)
+
+## MY Teckits Screen for Staff
+
+![Staff Ticket Screen](tickets/static/tickets/images/My_teckits_screen_Staff.PNG)
+
+
 ## Features
 - Custom user model with roles: Staff and Helper
 - User authentication (login, logout, signup)
@@ -58,7 +68,9 @@ IT-Helpdesk-Ticketing-System/
 │   │       ├── css/
 │   │       │   └── style.css
 │   │       └── images/
-│   │           └── header-logo.svg
+│   │           ├── header-logo.svg
+│   │           ├── My_teckits_screen_Helper.PNG
+│   │           └── My_teckits_screen_Staff.PNG
 │   └── templates/
 │       ├── about.html
 │       ├── base.html
