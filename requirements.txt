@@ -1,9 +1,11 @@
+Django==5.2.6
+gunicorn==23.0.0
+whitenoise==6.5.0
+psycopg2-binary==2.9.9
 asgiref==3.9.1
 certifi==2025.8.3
 distlib==0.4.0
-Django==5.2.6
 filelock==3.19.1
-gunicorn==23.0.0
 packaging==25.0
 pipenv==2025.0.4
 platformdirs==4.4.0
