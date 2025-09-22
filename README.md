@@ -98,6 +98,6 @@ IT-Helpdesk-Ticketing-System/
 
 ## Author
 
-This project was developed by mohdaaj and contributors.
+This project was developed by mohdaaj.
 
 
